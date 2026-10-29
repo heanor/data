@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-font-level="standard">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>五老教研室</title>
+<style>
+:root{
+  box-sizing:border-box;
+  --blue:#C62828;--blue-deep:#A91F1F;--blue-soft:#FDECEC;--blue-light:#E35B5B;
+  --bg:#F9F9F9;--surface:#FFFFFF;--text:#1B1B1B;--text-2:#4D4D4D;--text-3:#676767;--placeholder:#A6A6A6;
+  --border:#E4E4E4;--fill:#F5F5F5;
+  --radius:4px;
+  --shadow-card:0 1px 2px rgba(33,33,33,.04),0 2px 10px rgba(33,33,33,.05);
+  --shadow-hover:0 2px 4px rgba(33,33,33,.05),0 6px 18px rgba(33,33,33,.07);
+  --focus:0 0 0 3px rgba(198,40,40,.14);
+  --fs:1;--ctl:calc(40px * var(--fs));
+}
+html[data-font-level="large"]{--fs:1.125}
+html[data-font-level="xlarge"]{--fs:1.25}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);
+  font:400 calc(16px * var(--fs))/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+button,input,textarea{font:inherit;color:inherit}
+:focus-visible{outline:none;box-shadow:var(--focus)}
+.wrap{max-width:1440px;margin:0 auto;padding:0 24px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* 头图 */
+.hero{position:relative;overflow:hidden;background:var(--bg)}
+.hero-art{position:absolute;right:0;top:0;width:68%;height:100%}
+.hero-art svg{width:100%;height:100%;display:block}
+.hero::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(to right,rgba(249,249,249,.96) 0,rgba(249,249,249,.9) 30%,rgba(249,249,249,0) 62%),
+             linear-gradient(to bottom,rgba(249,249,249,0) 55%,var(--bg) 100%)}
+.hero .wrap{position:relative;z-index:1;padding-top:48px;padding-bottom:64px}
+.eyebrow{margin:0 0 8px;font-size:calc(14px * var(--fs));line-height:22px;color:var(--text-3)}
+h1{margin:0 0 12px;font-size:calc(32px * var(--fs));line-height:1.375;font-weight:600}
+.lead{max-width:560px;margin:0;color:var(--text-2)}
+
+/* 瀑布流卡片 */
+.content{position:relative;z-index:2;margin-top:-32px;padding-bottom:48px}
+.tl{list-style:none;margin:0;padding:0;column-width:380px;column-gap:20px}
+.item{break-inside:avoid;margin-bottom:20px}
+.card{position:relative;padding:24px;background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow-card);transition:box-shadow .2s}
+.card:hover{box-shadow:var(--shadow-hover)}
+.card header{display:flex;align-items:flex-start;gap:8px;margin-bottom:12px}
+.card h2{flex:1;display:flex;align-items:center;gap:8px;margin:0;font-size:calc(17px * var(--fs));line-height:24px;font-weight:600;overflow-wrap:anywhere}
+.card h2::before{content:"";flex:none;width:4px;height:calc(16px * var(--fs));border-radius:3px;background:var(--blue)}
+.card p{margin:0;color:var(--text-2)}
+.card p+p{margin-top:12px}
+.empty{display:flex;align-items:center;gap:8px;font-size:calc(15px * var(--fs));color:var(--text-3)}
+.acts{display:flex;margin:-8px -8px -8px 0}
+.ib{width:40px;height:40px;display:flex;align-items:center;justify-content:center;border:0;background:none;border-radius:var(--radius);color:var(--text-3);cursor:pointer;transition:background .16s,color .16s}
+.ib:hover{background:var(--blue-soft);color:var(--blue-deep)}
+/* 编辑、拖动：鼠标移到卡片上才显示 */
+.edit,.grip{opacity:0;transition:opacity .16s,background .16s,color .16s}
+.card:hover .edit,.card:hover .grip,.card:focus-within .edit,.card:focus-within .grip{opacity:1}
+.grip{position:absolute;left:0;top:0;bottom:0;width:24px;display:flex;align-items:flex-start;justify-content:center;padding:27px 0 0;border:0;background:none;border-radius:var(--radius) 0 0 var(--radius);color:var(--placeholder);cursor:grab}
+.grip:hover{background:var(--blue-soft);color:var(--blue)}
+.grip:active{cursor:grabbing}
+@media (hover:none){.edit,.grip{opacity:1}}
+
+/* 拖动中的占位 */
+.item.moving .card{background:var(--blue-soft);box-shadow:none;outline:1px dashed var(--blue)}
+.item.moving .card>*{visibility:hidden}
+
+/* 添加 / 编辑表单 */
+.addbtn{width:100%;min-height:calc(80px * var(--fs));display:flex;align-items:center;justify-content:center;gap:8px;background:var(--surface);border:1px dashed var(--blue-light);border-radius:var(--radius);color:var(--blue-deep);font-weight:500;cursor:pointer;transition:background .16s,border-color .2s}
+.addbtn:hover{background:var(--blue-soft);border-color:var(--blue)}
+.add .card{display:none}
+.add.open .card{display:block}
+.add.open .addbtn{display:none}
+.ef{display:flex;flex-direction:column;gap:16px}
+.ef label{display:block;margin-bottom:8px;font-weight:500}
+.ef input,.ef textarea{width:100%;padding:0 12px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);transition:border-color .2s,box-shadow .2s}
+.ef input{height:var(--ctl)}
+.ef textarea{height:calc(112px * var(--fs));padding:8px 12px;resize:vertical}
+.ef input:focus,.ef textarea:focus{outline:none;border-color:var(--blue);box-shadow:var(--focus)}
+.ef input[aria-invalid="true"]{border-color:var(--blue)}
+.ef ::placeholder{color:var(--placeholder)}
+.btns{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:12px}
+.btns .cf{flex:1 0 100%;margin:0}
+.del{margin-right:auto;min-height:40px;height:var(--ctl);padding:0 12px;border:0;background:none;border-radius:var(--radius);color:#B91C1C;cursor:pointer;transition:background .16s}
+.del:hover{background:var(--blue-soft)}
+.btn.danger{background:#B91C1C;border-color:#B91C1C;color:#fff}
+.btn.danger:hover{background:var(--blue-deep);border-color:var(--blue-deep)}
+.btn{min-height:40px;height:var(--ctl);padding:0 16px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);cursor:pointer;transition:background .16s}
+.btn:hover{background:var(--fill)}
+.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn.primary:hover{background:var(--blue-deep);border-color:var(--blue-deep)}
+
+@media (max-width:960px){.wrap{padding:0 16px}.hero-art{width:100%;opacity:.5}.hero::after{background:linear-gradient(to bottom,rgba(249,249,249,.85),rgba(249,249,249,.4) 60%,var(--bg))}}
+</style>
+</head>
+<body>
+<section class="hero">
+  <div class="hero-art" aria-hidden="true">
+    <!-- 占位头图：用你的真实图片替换这个 <svg> -->
+    <svg viewBox="0 0 900 340" preserveAspectRatio="xMaxYMid slice">
+      <defs>
+        <radialGradient id="glow" cx="82%" cy="12%" r="60%"><stop offset="0" stop-color="#E35B5B" stop-opacity=".55"/><stop offset="1" stop-color="#E35B5B" stop-opacity="0"/></radialGradient>
+        <linearGradient id="bar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E35B5B" stop-opacity=".32"/><stop offset="1" stop-color="#E35B5B" stop-opacity="0"/></linearGradient>
+      </defs>
+      <rect width="900" height="340" fill="url(#glow)"/>
+      <g fill="url(#bar)"><rect x="610" y="0" width="64" height="340"/><rect x="700" y="0" width="38" height="340"/><rect x="764" y="0" width="76" height="340"/><rect x="858" y="0" width="42" height="340"/></g>
+      <g fill="#C62828" opacity=".2"><path d="M300 20C370 -6 410 52 480 22L500 110C430 138 390 78 318 108Z"/><rect x="294" y="18" width="6" height="190" rx="2"/></g>
+      <g fill="#7F1616" opacity=".12">
+        <circle cx="430" cy="236" r="22"/><ellipse cx="430" cy="320" rx="40" ry="52"/>
+        <circle cx="520" cy="250" r="20"/><ellipse cx="520" cy="330" rx="38" ry="50"/>
+        <circle cx="610" cy="232" r="24"/><ellipse cx="610" cy="318" rx="44" ry="54"/>
+        <circle cx="700" cy="262" r="30"/><ellipse cx="700" cy="350" rx="56" ry="64"/>
+        <circle cx="810" cy="274" r="34"/><ellipse cx="810" cy="364" rx="62" ry="70"/>
+      </g>
+    </svg>
+  </div>
+  <div class="wrap">
+    <p class="eyebrow">本单位关工委</p>
+    <h1>五老教研室</h1>
+    <p class="lead">教研室名称、负责人、参与人员与活动记录各成一张小卡，鼠标移到卡片上，右上角会出现铅笔图标可编辑，左侧会出现 ⋮⋮ 可拖动调整顺序。</p>
+  </div>
+</section>
+
+<main class="content wrap">
+  <ol class="tl" id="tl">
+    <li class="item add" id="add">
+      <button class="addbtn" type="button" id="openAdd"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>添加字段</button>
+      <article class="card" id="addCard"></article>
+    </li>
+  </ol>
+  <div class="sr" id="live" aria-live="polite"></div>
+</main>
+
+<script>
+const GRIP='<svg width="12" height="18" viewBox="0 0 12 18" fill="currentColor" aria-hidden="true"><circle cx="3" cy="3" r="1.5"/><circle cx="9" cy="3" r="1.5"/><circle cx="3" cy="9" r="1.5"/><circle cx="9" cy="9" r="1.5"/><circle cx="3" cy="15" r="1.5"/><circle cx="9" cy="15" r="1.5"/></svg>';
+const PEN='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 20l4-1 11-11-3-3L5 16zM14 7l3 3"/></svg>';
+const EMPTY='<div class="empty"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 5h16v11H8l-4 4z"/></svg>暂无内容</div>';
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const tl=document.getElementById('tl'),add=document.getElementById('add'),live=document.getElementById('live');
+let uid=0,drag=null,lastMove=0;
+
+function paint(li){
+  const d=li._d, body=d.b.trim()?d.b.trim().split(/\n+/).map(p=>`<p>${esc(p)}</p>`).join(''):EMPTY;
+  li.innerHTML=`<article class="card"><button class="grip" type="button" draggable="true" aria-label="拖动调整“${esc(d.t)}”的顺序，也可按方向键" title="拖动排序">${GRIP}</button><header><h2>${esc(d.t)}</h2><div class="acts">
+    <button class="ib edit" type="button" aria-label="编辑“${esc(d.t)}”" title="编辑">${PEN}</button></div></header>${body}</article>`;
+}
+function form(t,b,ok,del){const i=++uid;
+  return `<div class="ef"><div><label for="t${i}">字段名称</label><input id="t${i}" type="text" value="${esc(t)}" placeholder="例如：经费使用情况"></div>
+  <div><label for="b${i}">字段内容</label><textarea id="b${i}" placeholder="请输入内容">${esc(b)}</textarea></div>
+  <div class="btns">${del?'<button class="del" type="button">删除</button>':''}<button class="btn cancel" type="button">取消</button><button class="btn primary save" type="button">${ok}</button></div></div>`;
+}
+function edit(li){const d=li._d;li.innerHTML=`<article class="card">${form(d.t,d.b,'保存',true)}</article>`;li.querySelector('input').focus()}
+function create(d){const li=document.createElement('li');li.className='item';li._d=d;paint(li);return li}
+
+[['教研室名称','五老教研室'],['负责人','张三'],
+ ['参与人员','李四、王五、赵六、钱七、孙八等 9 人，其中退休教师 5 人、在职教师 4 人。'],
+ ['活动记录','3 月 12 日：围绕“分层教学”召开专题研讨会，9 人参加，形成会议纪要一份。\n4 月 20 日：赴实验学校听课 3 节，课后与任课教师座谈，收集改进意见 12 条。\n5 月 8 日：组织青年教师公开课，邀请退休教师现场点评，并整理成教学案例。'],
+ ['教研主题','初中数学分层教学的设计与实践。\n重点研究课堂练习分层、作业分层与课后辅导三个环节。']
+].forEach(([t,b])=>tl.appendChild(create({t,b})));
+
+/* 添加 */
+const addCard=document.getElementById('addCard');
+const openAdd=v=>{add.classList.toggle('open',v);if(v){addCard.innerHTML=form('','','确定');addCard.querySelector('input').focus()}else document.getElementById('openAdd').focus()};
+document.getElementById('openAdd').onclick=()=>openAdd(true);
+
+/* 编辑 / 保存 / 取消（事件委托） */
+tl.addEventListener('click',e=>{
+  const li=e.target.closest('.item');if(!li)return;
+  if(e.target.closest('.edit'))return edit(li);
+  if(e.target.closest('.cancel'))return li===add?openAdd(false):paint(li);
+  if(e.target.closest('.del')){const b=li.querySelector('.btns');li._btns=b.innerHTML;b.innerHTML='<p class="cf">确定删除这个字段吗？删除后无法恢复。</p><button class="btn undo" type="button">取消</button><button class="btn danger yes" type="button">确认删除</button>';b.querySelector('.undo').focus();return}
+  if(e.target.closest('.undo')){const b=li.querySelector('.btns');b.innerHTML=li._btns;b.querySelector('.del').focus();return}
+  if(e.target.closest('.yes')){li.remove();live.textContent='已删除';document.getElementById('openAdd').focus();return}
+  if(e.target.closest('.save')){
+    const inp=li.querySelector('input'),t=inp.value.trim(),b=li.querySelector('textarea').value;
+    if(!t){inp.setAttribute('aria-invalid','true');inp.focus();return}
+    if(li===add){const n=create({t,b});tl.appendChild(n);openAdd(false);n.scrollIntoView({block:'nearest',behavior:'smooth'})}
+    else{li._d={t,b};paint(li);li.querySelector('.edit').focus()}
+  }
+});
+tl.addEventListener('keydown',e=>{
+  const li=e.target.closest('.item');if(!li)return;
+  if(e.key==='Escape'&&e.target.closest('.ef')){li===add?openAdd(false):paint(li);return}
+  const g=e.target.closest('.grip');if(!g)return;
+  const back=e.key==='ArrowUp'||e.key==='ArrowLeft',fwd=e.key==='ArrowDown'||e.key==='ArrowRight';
+  if(!back&&!fwd)return;e.preventDefault();
+  if(back){const p=li.previousElementSibling;if(p&&p!==add)tl.insertBefore(li,p);else return}
+  else{const n=li.nextElementSibling;if(n)tl.insertBefore(li,n.nextElementSibling);else return}
+  li.querySelector('.grip').focus();
+  live.textContent=`已移动到第 ${[...tl.children].indexOf(li)} 位`;
+});
+
+/* 拖拽排序：拖动时卡片实时让位，松手即确定 */
+tl.addEventListener('dragstart',e=>{
+  const g=e.target.closest('.grip');if(!g)return;
+  drag=g.closest('.item');
+  e.dataTransfer.setData('text/plain','move');e.dataTransfer.effectAllowed='move';
+  e.dataTransfer.setDragImage(drag.querySelector('.card'),24,24);
+  setTimeout(()=>drag&&drag.classList.add('moving'),0);
+});
+tl.addEventListener('dragend',()=>{if(drag)drag.classList.remove('moving');drag=null});
+const area=document.querySelector('.content');
+area.addEventListener('dragover',e=>{
+  if(!drag)return;e.preventDefault();e.dataTransfer.dropEffect='move';
+  if(performance.now()-lastMove<180)return;
+  let best=null,bd=Infinity;
+  for(const it of tl.children){
+    const r=it.getBoundingClientRect(),
+      dx=e.clientX<r.left?r.left-e.clientX:e.clientX>r.right?e.clientX-r.right:0,
+      dy=e.clientY<r.top?r.top-e.clientY:e.clientY>r.bottom?e.clientY-r.bottom:0,
+      d=dx*dx+dy*dy;
+    if(d<bd){bd=d;best=it}
+  }
+  if(!best||best===drag)return;
+  const r=best.getBoundingClientRect(),after=best===add||e.clientY>r.top+r.height/2;
+  const ref=after?best.nextElementSibling:best;
+  if(ref===drag)return;
+  tl.insertBefore(drag,ref);lastMove=performance.now();
+});
+area.addEventListener('drop',e=>{if(drag)e.preventDefault()});
+</script>
+</body>
+</html>
